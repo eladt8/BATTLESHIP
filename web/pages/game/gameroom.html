@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>BattleShipGameRoom</title>
+    <script src="../../jquery-2.0.3.min.js"></script>
+    <script src="../../context-path-helper.js"></script>
+    <script src="gameroom.js"></script>
+    <script src="gameroomchat.js"></script>
+    <style>
+
+
+        #top {
+            position: relative;
+            top: 2px;
+            background-color: #ffede5;
+            background-size: 100%;
+        }
+
+        #exitGame {
+            float: right;
+            margin: 20px 40px 10px 10px;
+            width: auto;
+            padding: 2px;
+            color: red;
+            font-size: large;
+        }
+
+        #body {
+            position: relative;
+            top: 3px;
+            background-color: #444466;
+        }
+
+        #boardsdiv {
+            width: 75%;
+            float: left;
+        }
+
+        table.boards {
+            width: 45%;
+            display: inline-block;
+            overflow: auto;
+            margin-right: 5px;
+        }
+
+        #chatDiv {
+            position: relative;
+            left: 3px;
+            width: 25%;
+            height: 450px;
+            background-color: #ff815c;
+            float: left;
+            overflow: auto;
+        }
+
+        #bottom {
+            padding: 5px;
+            background-color: #ffede5;
+            position: relative;
+            clear: left;
+            top: 3px;
+            width: 100%;
+            height: auto;
+        }
+
+        #clockDiv {
+            margin: auto;
+            width: 14%;
+        }
+
+        #mineDiv {
+            position: absolute;
+            left: 10px;
+            top: 5px;
+        }
+
+        #tablesDiv {
+            margin: auto;
+            width: 50%;
+
+        }
+
+        #playerShipLeft {
+            margin-left: 5px;
+            display: inline-block;
+            border-collapse: collapse;
+
+        }
+
+        #EnemyShipLeft {
+            margin-right: 5px;
+            display: inline-block;
+            border-collapse: collapse;
+        }
+
+        tr, td.ShipLeftTable {
+            border: 1px solid black;
+            padding: 2px;
+
+        }
+
+        th.staticsTable {
+            background-color: #91ffe2;
+            border: 1px solid black;
+
+            height: 60%;
+        }
+
+        tr, td.staticsTable {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        td.shipTypeTD {
+            background-color: #91ffe2;
+            border: 1px solid black;
+        }
+
+        table.staticsTable {
+            margin: 0px 10px 0px 10px;
+            display: inline-block;
+            border-collapse: collapse;
+
+        }
+
+        ul {
+            color: #040696; /* bullet color */
+
+        }
+
+    </style>
+</head>
+
+<body background="../../resources/background3.jpg" style="background-repeat: no-repeat;background-size: 100% 100vh;">
+<!--its ugly, change picture-->
+<div id="top">
+    <form>
+        <input id="exitGame" type="button" value="Quit game" onclick="logoutAction()"/>
+    </form>
+    <h2 id="header">Y</h2>
+    <h3 id="PlayerTurn">X</h3>
+</div>
+<div id="body">
+    <div id="boardsdiv">
+        <table class="boards" id="ShipsBoard">
+            <caption style="font-size: larger;font-style: oblique">Ships board</caption>
+        </table>
+        <table class="boards" id="HitsBoard">
+            <caption style="font-size: larger;font-style: oblique">Hits Board</caption>
+        </table>
+    </div>
+    <div id="chatDiv">
+        <h4>Chat</h4>
+        <ul id="userslist"></ul>
+        <div id="chatarea" class="span6"></div>
+        <form id="chatform">
+            <input type="text" id="userString" name="userString" required/>
+            <input type="submit" value="Send"/>
+        </form>
+    </div>
+</div>
+<div id="bottom">
+    <div id="clockDiv">
+        <table>
+            <tr>
+                <th>Clock:</th>
+            </tr>
+            <tr>
+                <td id="fillMinutes">M</td>
+                <td id="fillSeconds">S</td>
+            </tr>
+        </table>
+    </div>
+    <div id="tablesDiv">
+        <div id="mineDiv">
+            <p id="fillMineAmount"></p>
+            <div id="fillMineImg"></div>
+        </div>
+        <table class="ShipLeftTable" id="playerShipLeft">
+            <caption>Player ships left</caption>
+            <tr class="ShipLeftTable">
+                <td class="shipTypeTD">horizontal</td>
+                <td class="ShipLeftTable" id="fillHorizontal">X</td>
+            </tr>
+            <tr class="ShipLeftTable">
+                <td class="shipTypeTD">vertical</td>
+                <td class="ShipLeftTable" id="fillVertical">X</td>
+            </tr>
+            <tr class="ShipLeftTable">
+                <td class="shipTypeTD">L Shape</td>
+                <td class="ShipLeftTable" id="fillLShape">X</td>
+            </tr>
+        </table>
+        <table class="staticsTable" id="staticsTable">
+            <caption>Player statics</caption>
+            <tr>
+                <th class="staticsTable">Score</th>
+                <th class="staticsTable">Hits</th>
+                <th class="staticsTable">Misses</th>
+                <th class="staticsTable">Average turn time</th>
+                <th class="staticsTable">Turns played</th>
+            </tr>
+            <td class="staticsTable" id="fillScore">X</td>
+            <td class="staticsTable" id="fillHits">X</td>
+            <td class="staticsTable" id="fillMiss">X</td>
+            <td class="staticsTable" id="fillAvTurnTime">X</td>
+            <td class="staticsTable" id="fillTurnsPlayed">X</td>
+            </tr>
+        </table>
+        <table class="staticsTable" id="enemyStaticsTable">
+            <caption>Enemy statics</caption>
+            <tr>
+                <th class="staticsTable">Score</th>
+                <th class="staticsTable">Hits</th>
+                <th class="staticsTable">Misses</th>
+                <th class="staticsTable">Average turn time</th>
+                <th class="staticsTable">Turns played</th>
+            </tr>
+            <td class="staticsTable" id="EnemyfillScore">X</td>
+            <td class="staticsTable" id="EnemyfillHits">X</td>
+            <td class="staticsTable" id="EnemyfillMiss">X</td>
+            <td class="staticsTable" id="EnemyfillAvTurnTime">X</td>
+            <td class="staticsTable" id="EnemyfillTurnsPlayed">X</td>
+            </tr>
+        </table>
+        <table class="ShipLeftTable" id="EnemyShipLeft">
+            <caption>Enemy ships left</caption>
+            <tr class="ShipLeftTable">
+                <td class="shipTypeTD">horizontal</td>
+                <td class="ShipLeftTable" id="fillHorizontalEnemy">X</td>
+            </tr>
+            <tr class="ShipLeftTable">
+                <td class="shipTypeTD">vertical</td>
+                <td class="ShipLeftTable" id="fillVerticalEnemy">X</td>
+            </tr>
+            <tr class="ShipLeftTable">
+                <td class="shipTypeTD">L Shape</td>
+                <td class="ShipLeftTable" id="fillLShapeEnemy">X</td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>
